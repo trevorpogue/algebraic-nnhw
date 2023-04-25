@@ -1,0 +1,160 @@
+#!/bin/bash
+
+# Author: Trevor Pogue, 2021
+
+################################################################################
+# Help                                                                         #
+################################################################################
+testcmds_print_help()
+{
+				echo "Usage: testcmds [OPTIONS]"
+				echo
+				echo "When developing other bash scripts, use this script to check that your other bash script is generating the correct commands before actually executing them. This avoids potential catastrophic mistakes of deleting the wrong files etc."
+				echo
+				echo "The script under development must contain an array called \`cmds\`. Additional messages can be printed if another array called \`msgs\` is defined."
+				echo
+				echo "Example usage from within script under development:"
+				echo ""
+				echo "cmds=()"
+				echo "cmds+=(\"rm -r old_dir1\")"
+				echo "cmds+=(\"rm -r old_dir2\")"
+				echo "source testcmds -p  # print the commands"
+				echo "source testcmds -e  # execute the command"
+				echo
+				echo "See usage in host/setup for another example."
+				echo
+				echo "Warning: this script must be called using \`source\` in order to pass the arrays from the other script and work properly. Since this script is run with \`source\`, all the function/variable names are defined with a testcmds prefix to avoid namespace collision with the developement script."
+				echo
+				echo
+				echo "Main options:"
+				echo "-p                       Print commands in cmds array"
+				echo "-e                       Execute commands in cmds array"
+				echo
+				echo "Advanced options:"
+				echo "-l [\`path/filename\`]    Print to a log file instead of stdout."
+				echo "-m                      Also print messages in \`msgs\` array defined in dev script."
+}
+
+################################################################################
+# Utilities                                                                    #
+################################################################################
+testcmds_parse_options () {
+				testcmds_positional=()
+				testcmds_do_eval=
+				testcmds_do_print=
+				testcmds_do_print_cmds=
+				testcmds_log_path=
+				while [[ $# -gt 0 ]]; do
+								testcmds_key="$1"
+								case $testcmds_key in
+												-p|--print)
+																testcmds_do_print=1
+																testcmds_do_print_cmds=1
+																shift
+																;;
+												--eval_no_print)
+																testcmds_do_eval="1"
+																shift
+																;;
+												-e|--eval)
+																testcmds_do_eval="1"
+																testcmds_do_print=1
+																shift
+																;;
+												-m|--messages)
+																testcmds_do_print=1
+																testcmds_do_msgs=1
+																shift
+																;;
+												-l|--log)
+																testcmds_log_path="$2"
+																shift
+																shift
+																;;
+												*)    # unknown option
+																testcmds_positional+=("$1") # save it in an array for later
+																shift ;;
+								esac; done
+
+				if [ -n "$testcmds_log_path" ]; then
+								testcmds_init_log_file "$log_file"
+				fi
+}
+
+testcmds_print () {
+				if [ -n "$testcmds_do_print" ]; then
+								echo "$@"
+								[ -n "$testcmds_log_path" ] && echo "$@" >> $testcmds_log_path
+				fi
+}
+
+
+testcmds_init_log_file () {
+				if [ ! -f "$1" ]; then
+								# echo "File not found!"
+								touch "$1"
+				fi
+				echo "" > "$1"
+}
+
+testcmds_print_bar () {
+				testcmds_print "________________________________________________________________________________"
+}
+
+testcmds_main () {
+				echo ""
+				testcmds_print_bar
+				if [ -n "$testcmds_do_msgs" ]; then
+								testcmds_print "Info:"
+								testcmds_print "-----"
+								testcmds_log_array "${msgs[@]}"
+								testcmds_print_bar
+				fi
+				if [ -n "$testcmds_do_eval" ]; then
+								testcmds_print "Running following commands:"
+								testcmds_print "-----------------"
+								testcmds_log_array "${cmds[@]}"
+								testcmds_print_bar
+								testcmds_do_and_log_cmds
+				fi
+				if [ -n "$testcmds_do_print_cmds" ]; then
+								testcmds_print "Printing following commands:"
+								testcmds_print "-----------------"
+								testcmds_log_array "${cmds[@]}"
+								testcmds_print_bar
+				fi
+}
+
+testcmds_log_array () {
+				for c in "$@"; do
+								testcmds_print "${c[@]}"
+				done
+}
+
+testcmds_do_and_log_cmds () {
+				for c in "${cmds[@]}"; do
+								# testcmds_print "------------"
+								# testcmds_print "Running cmd:"
+								# testcmds_print "---"
+								testcmds_print "--- $c"
+								# testcmds_print "-----------"
+								eval "$c" # || {exit 1}
+				done
+}
+
+################################################################################
+# Main program                                                                 #
+################################################################################
+# check for -h or --help options, or no options
+while getopts ":h" option; do
+				case $option in
+								h) # display Help
+												testcmds_print_help
+												exit;;
+				esac
+done
+[ -z "$1" ] && testcmds_print_help && exit
+
+testcmds_parse_options $@
+# main body
+testcmds_main

@@ -1,0 +1,49 @@
+# sphinx-start-usage
+$ print(menu)
+ _________________________
+│  _____________________  │
+│ │ 'Breakfast'         │ │
+│ │ main = 'Bacon&Eggs' │ │
+│ │ side = 'HashBrown'  │ │
+│  ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯  │
+│  _________________      │
+│ │ 'Dinner'        │     │
+│ │ main = 'Burger' │     │
+│ │ side = 'Fries'  │     │
+│  ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯      │
+ ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
+# sphinx-end-usage
+# sphinx-start-complex
+$ print(library)
+ ________________________________________
+│ 'My Bookshelf'                         │
+│    ______________________________      │
+│   │ 'Fiction'                    │     │
+│   │ topic = 'Fantasy'            │     │
+│   │    ________________________  │     │
+│   │   │ 'LOTR'                 │ │     │
+│   │   │ author = 'JRR Tolkien' │ │     │
+│   │   │ topic  = 'Hobbits'     │ │     │
+│   │    ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯  │     │
+│   │    _______________________   │     │
+│   │   │ 'Harry Potter'        │  │     │
+│   │   │ author = 'JK Rowling' │  │     │
+│   │   │ topic  = 'Wizards'    │  │     │
+│   │    ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯   │     │
+│    ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯      │
+│    __________________________________  │
+│   │ 'Non-Fiction'                    │ │
+│   │ topic = 'Physics'                │ │
+│   │    ____________________________  │ │
+│   │   │ 'General Relativity'       │ │ │
+│   │   │ author = 'Albert Einstein' │ │ │
+│   │   │ topic  = 'Time, Gravity'   │ │ │
+│   │    ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯  │ │
+│   │    ___________________________   │ │
+│   │   │ 'A Brief History of Time' │  │ │
+│   │   │ author = 'Steven Hawking' │  │ │
+│   │   │ topic  = 'Black Holes'    │  │ │
+│   │    ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯   │ │
+│    ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯  │
+ ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
+# sphinx-end-complex

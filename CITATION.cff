@@ -1,0 +1,13 @@
+cff-version: 1.2.0
+message: "Please cite this software using the information provided below."
+authors:
+- family-names: "Pogue"
+  given-names: "Trevor E"
+  orcid: "https://orcid.org/0000-0002-6791-3758"
+- family-names: "Nicolici"
+  given-names: "Nicola"
+  orcid: "https://orcid.org/0000-0001-6345-5908"
+title: "Algebraic Methods for Deep Neural Network Accelerator Architectures"
+version: 0.0.0
+date-released: 2023-04-25
+url: "https://github.com/trevorpogue/algebraic-nnhw"

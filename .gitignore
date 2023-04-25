@@ -1,0 +1,132 @@
+#### global ignores ####
+_old*
+_legacy*
+_run.sh
+sim/builds
+synth/*builds*
+synth/*result*
+synth/base*
+synth/*
+!synth/cli.py
+!synth/__init__.py
+!synth/build.py
+synth/*/*
+# synth/builds/*/*
+# !synth/builds/*/synth_dut.sv
+# !synth/builds/*/*.qsf
+# !synth/builds/*/*.sdc
+transcript
+**/qdb
+**/tmp-clearbox
+**/output_files
+bin/log
+*log
+synth-log*
+log*
+log2
+bk/
+archive/
+ip/*
+_remote_setup.sh
+_notes.txt
+_notes.py
+article/ref
+# article
+nohup.out
+
+#### device ignores ####
+# large files:
+*.vqm
+instruc_cache*
+
+#### emacs ignores ####
+.projectile
+
+#### git ignores ####
+_commit_message.txt
+
+#### Python ignores ####
+_device_data.txt
+*outlog*
+*/out.log
+
+*.py[cod]
+__pycache__
+
+# C extensions
+*.so
+
+# Packages
+*.egg
+*.egg-info
+dist
+build
+eggs
+.eggs
+parts
+var
+sdist
+wheelhouse
+develop-eggs
+.installed.cfg
+lib
+lib64
+venv*/
+pyvenv*/
+pip-wheel-metadata/
+
+# Installer logs
+pip-log.txt
+
+# Unit test / coverage reports
+.coverage
+.tox
+.coverage.*
+.pytest_cache/
+nosetests.xml
+coverage.xml
+htmlcov
+
+# Translations
+*.mo
+
+# Buildout
+.mr.developer.cfg
+
+# IDE project files
+.project
+.pydevproject
+.idea
+.vscode
+*.iml
+*.komodoproject
+
+# Complexity
+output/*.html
+output/*/index.html
+
+# Sphinx
+docs/_build
+.DS_Store
+*~
+.*.sw[po]
+.build
+.ve
+.env
+.cache
+.pytest
+.benchmarks
+.bootstrap
+.appveyor.token
+*.bak
+
+# Mypy Cache
+.mypy_cache/
+
+# other
+*scrap*
+*.~undo-tree~
+*.stp
+_broken.py
+profile.svg
+profiling/
