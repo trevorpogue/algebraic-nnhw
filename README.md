@@ -1,4 +1,4 @@
-This repository contains the source code for a configurable hardware accelerator.
+This repository contains the source code for the accelerator that can be parameterized to contain the baseline, FIP, or FFIP MXUs.
 The organization is as follows:
 - compiler
   - A compiler for parsing Python models into accelerator instructions that allow it to accelerate the model. This part also includes code for running models on the accelerator and reading back results and performance counters.
