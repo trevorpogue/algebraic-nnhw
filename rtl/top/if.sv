@@ -192,7 +192,7 @@ interface dpram_array_bus
       )
     (input logic clk, resetn);
     localparam  WIDTH = $bits(D);
-k    localparam  type _INFO = INFO[I-1:0];
+    localparam  type _INFO = INFO[I-1:0];
     localparam  type _D = D[I-1:0];
     localparam  type _Q = Q[I-1:0];
     data #(.VALUE(_D), .INFO(_INFO)) d(.*);

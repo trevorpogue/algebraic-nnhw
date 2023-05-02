@@ -41,15 +41,6 @@ module arith import globals::*;
     data #(Cjvec) post_gemm_d(.clk, .resetn);
 
     localparam   DELAY0 = 1;
-    Tiler::DIGIT c_tilecounter_a, c_tilecounter_b, c_tilecounter_pgp;
-    Tiler::DIGIT c_tilecounter_a2, c_tilecounter_b2, c_tilecounter_pgp2;
-    logic        reset;
-    assign reset = wrote_layerio_layer | wrote_inference;
-    `SIMCOUNTER(c_tilecounter_pgp2, post_gemm_params.q.info.new_tile_k);
-    `SIMCOUNTER(c_tilecounter_pgp, post_gemm_params.q.info.new_tile_k, reset);
-    Tiler::DIGIT c_cvalids, c_gemmvalids;
-    `SIMCOUNTER(c_gemmvalids, gemm_q.info.valid, reset);
-    `SIMCOUNTER(c_cvalids, c.info.valid, reset);
     ////////////////////////////////////////////////////////////////////
     `REG__(a_ready, layerio.rdready, DELAY0);
     `REG__(b_ready, weight.rdready, DELAY0);
@@ -92,7 +83,7 @@ module arith import globals::*;
     assign a_rdreq_d = ready_for_a_tile
                        & prev_layer_written & layerio.rdready
                        & !layerio.half_full
-					   & post_gemm_params.rdready
+                       & post_gemm_params.rdready
                        & pgp_ready_for_a_tile;
     `POSEDGE_(layerio.rdreq, a_rdreq_d, 1, a_rdreq_d);
     ////////////////////////////////////////////////////////////////////;
@@ -101,10 +92,10 @@ module arith import globals::*;
              & layer_params.islastlayer & layer_params.islast_inbatch,
              !(layer_params.islastlayer & layer_params.islast_inbatch));
     assign b_rdreq_d
-        = weight.rdready & post_gemm_ready
-          & ready_for_b_tile
-          & !done_inference
-          & top_ready;
+      = weight.rdready & post_gemm_ready
+        & ready_for_b_tile
+        & !done_inference
+        & top_ready;
     `POSEDGE_(weight.rdreq, b_rdreq_d, 1, b_rdreq_d);
     ////////////////////////////////////////////////////////////////////
 
@@ -123,23 +114,27 @@ module arith import globals::*;
     `REG(padded_tile_size_n, layer_params.tile_size_m < MIN_TILE_SIZE_N?
          MIN_TILE_SIZE_N : layer_params.tile_size_m);
     pad_tile_size_n #(`EXPORT_ARITH) b_buf_u
-        (.q(b), .d(weight.q),
-         .start_tile_rd(weight.rdreq),
-         .padded_tile_size_n,
-         .clk, .resetn);
+      (.q(b), .d(weight.q),
+       .start_tile_rd(weight.rdreq),
+       .padded_tile_size_n,
+       .clk, .resetn);
     pad_tile_size_n #(`EXPORT_ARITH) post_gemm_params_buf_u
-        (.q(post_gemm_params_q), .d(post_gemm_params.q),
-         .start_tile_rd(post_gemm_params.rdreq),
-         .padded_tile_size_n,
-         .clk, .resetn);
+      (.q(post_gemm_params_q), .d(post_gemm_params.q),
+       .start_tile_rd(post_gemm_params.rdreq),
+       .padded_tile_size_n,
+       .clk, .resetn);
 
     localparam                          ADELAY = 0;
     `SHIFT_REG(a, layerio.q, ADELAY, a);
     `SHIFT_REG(a.info_master, layerio.q.info_slave, ADELAY, a_info_delay);
 
     gemm #(`EXPORT_ARITH) gemm_u
-        (.c(gemm_q), .a, .b,
-         .clk, .resetn);
+      (.c(gemm_q),
+       .a,
+       .b,
+       .layer_params,
+       .clk,
+       .resetn);
     if (CONNECT_GEMM) begin
         assign layerio.wrreq = layerio.d.info.valid;
         assign layerio.d.value = c.value;
@@ -151,15 +146,15 @@ module arith import globals::*;
     `WORDSWAP2(_a, a);
     `REG_DATA_COND(post_gemm_d, 1, gemm_q, _a);
     post_gemm #(`EXPORT_ARITH) post_gemm_u
-        (.q(_c), .d(post_gemm_d),
-         .results,
-         .layer_params,
-         .top_ready(arith_ready),
-         .wrote_layerio_layer(wrote_layerio_layer | wrote_inference),
-         .ready(post_gemm_ready),
-         .params(post_gemm_params_q),
-         .pooling_clk, .padding_clk, .quantization_clk,
-         .clk, .resetn);
+      (.q(_c), .d(post_gemm_d),
+       .results,
+       .layer_params,
+       .top_ready(arith_ready),
+       .wrote_layerio_layer(wrote_layerio_layer | wrote_inference),
+       .ready(post_gemm_ready),
+       .params(post_gemm_params_q),
+       .pooling_clk, .padding_clk, .quantization_clk,
+       .clk, .resetn);
     `WORDSWAP2(c, _c);
 
     if (SIM | USE_RESULT_FIFOS_FULL) begin : sim
@@ -172,7 +167,7 @@ module arith import globals::*;
         assign gemm_c.info_master.value = _gemm_c.info;
         triangle_buf #(.SLOPE(-1)) gemm_triangle_u (.q(_gemm_c), .d(gemm_q));
         fifobus #(.Q(Ajvec), .D(Cjvec), .DEPTH(RESULT_FIFOS_DEPTH)) qfifo
-            (.clk, .resetn);
+          (.clk, .resetn);
         `REG3(qfifo.d.value, qfifo_d, _gemm_c.value);
         `REG3(qfifo.wrreq, qfifo_wrreq, _gemm_c.info.valid);
         `REG3(qfifo.rdreq, qfifo_rdreq, !qfifo.empty);
@@ -181,11 +176,11 @@ module arith import globals::*;
         data #(Chainjvec) dummy(.*);
         assign dummy.info_master.value.valid = '0;
         `REG_DATA_COND(results_d, 1, qfifo.q, dummy);
-		if (USE_RESULT_FIFOS_FULL) begin
+        if (USE_RESULT_FIFOS_FULL) begin
             `ASSIGN_RESULT(GEMM_RESULTS_SEL, results_d);
             `ASSIGN_RESULT(A_RESULTS_SEL, a);
             `ASSIGN_RESULT(B_RESULTS_SEL, b);
-		end
+        end
     end
     if (SIM | USE_RESULT_FIFOS_FULL) begin : sample_pgp
         fifobus #(.Q(Ajvec), .D(PostGemmParams), .DEPTH(RESULT_FIFOS_DEPTH))
@@ -194,9 +189,9 @@ module arith import globals::*;
         `REG3(qfifo.wrreq, qfifo_wrreq, post_gemm_params_q.info.valid);
         `REG3(qfifo.rdreq, qfifo_rdreq, !qfifo.empty);
         `FIFO(qfifo);
-		if (USE_RESULT_FIFOS_FULL) begin
+        if (USE_RESULT_FIFOS_FULL) begin
             `ASSIGN_RESULT(POST_GEMM_PARAMS_RESULTS_SEL, qfifo.q);
-		end
+        end
     end
 endmodule
 

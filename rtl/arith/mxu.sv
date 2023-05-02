@@ -49,10 +49,10 @@ module mxu import globals::*;
         (.q(__c), .qinfo(__cinfo), .d(_c), .dinfo(_cinfo), .clk, .resetn);
     assign c = __c; assign cinfo = __cinfo;
     if (FIP_METHOD == FFIP) begin : model
-        ffip_a_buf #(`EXPORT_ARITH) a_buf_u
+        ffip_a_buf_and_preadders #(`EXPORT_ARITH) a_buf_u
             (.q(amat), .bmat, .d(a_), .dinfo(a_info),
              .alpha_vec, .clk, .resetn);
-        ffip_b_buf #(`EXPORT_ARITH) b_buf_u0
+        y_generator #(`EXPORT_ARITH) b_buf_u0
             (.q(_b), .d(triangle_b), .qinfo(_binfo), .dinfo(triangle_binfo),
              .clk, .resetn);
         b_buf #(`EXPORT_ARITH) b_buf_u(.q(bmat), .d(_b),
@@ -99,7 +99,7 @@ module mxu import globals::*;
 endmodule
 
 
-module ffip_a_buf import globals::*;
+module ffip_a_buf_and_preadders import globals::*;
     #(`IMPORT_ARITH)
     (interface q, bmat,
      input Ajvec d, Info dinfo,
@@ -144,7 +144,7 @@ module ffip_a_buf import globals::*;
 endmodule
 
 
-module ffip_b_buf import globals::*;
+module y_generator import globals::*;
     #(`IMPORT_ARITH)
     (output BMatJvec q, Info qinfo,
      input Bjvec d, Info dinfo, input logic clk, resetn);
