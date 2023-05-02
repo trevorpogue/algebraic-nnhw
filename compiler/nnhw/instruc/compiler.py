@@ -343,15 +343,15 @@ class Compiler:
         self._set_nn_param(first_layer_params_instruc, layer.parent)
 
     def _compile_layer_params(self, layer):
-        layer_params = layer.instrucs.layer_params
-        if hasattr(layer_params, 'do_conv'):
-            layer_params.size_w_gemm = 0
+        lparams = layer.instrucs.layer_params
+        if not layer.do_conv:
+            lparams.size_w_gemm = 0
         for iokey in IOs.POST_CONV + [IO.GEMM]:
             if iokey != IO.C:
                 key = 'size_h_' + iokey
-                setattr(layer_params, key, layer.HWs[iokey].i)
+                setattr(lparams, key, layer.HWs[iokey].i)
             key = 'size_w_' + iokey
-            setattr(layer_params, key, layer.HWs[iokey].j)
+            setattr(lparams, key, layer.HWs[iokey].j)
         if config.use_layer1_optimization2 and layer.isfirst:
             count_k_kernel_h_dim = 5
             count_k_kernel_w_dim = 4
@@ -387,16 +387,16 @@ class Compiler:
             size = space.size
             stride[count_Cin_dim] = stride[fill_m_h_dim]
             stride[fill_m_h_dim] *= size[count_Cin_dim]
-        layer_params.total_layerio_reads = prod(
+        lparams.total_layerio_reads = prod(
             layer.instrucs.layerio_rd_instrucs[layer.rdmem].size)
-        layer_params.layeriomem_wrsel = layer.wrmem
-        layer_params.layeriomem_rdsel = layer.rdmem
-        layer_params.tile_size_m = layer.tile_sizes[M]
-        layer_params.total_weight_reads = prod(
+        lparams.layeriomem_wrsel = layer.wrmem
+        lparams.layeriomem_rdsel = layer.rdmem
+        lparams.tile_size_m = layer.tile_sizes[M]
+        lparams.total_weight_reads = prod(
             layer.instrucs.weight_rd_instruc.size)
         self._set_offsets(layer)
         batch_size = layer.parent[0].batch_size
-        total_weight_reads_all_layers = layer_params.total_weight_reads
+        total_weight_reads_all_layers = lparams.total_weight_reads
         total_pgp_reads_all_layers = prod(
             layer.instrucs.post_gemm_params_rd_instruc.size)
         if not layer.islinear:
@@ -416,31 +416,31 @@ class Compiler:
                 self.device.WEIGHTMEM_CLK_DIV)
         layer.instrucs.weight_rd_instruc.stride[-2] *= (
                 self.device.SZI)
-        layer_params.size_w_c = layer.HWs.c.j
+        lparams.size_w_c = layer.HWs.c.j
         if layer.is_first_linear_after_conv:
-            layer_params.size_w_c *= layer.parent[0].batch_size
-        layer_params.pool_size = layer.pool_size
-        layer_params.pool_stride = layer.pool_stride
-        layer_params.avg_pool_denom = layer.pool_size ** 2
-        layer_params.pool_padding = layer.pool_padding
-        layer_params.c_padding = layer.c_padding
-        layer_params.pool_type = layer.pool_type
+            lparams.size_w_c *= layer.parent[0].batch_size
+        lparams.pool_size = layer.pool_size
+        lparams.pool_stride = layer.pool_stride
+        lparams.avg_pool_denom = layer.pool_size ** 2
+        lparams.pool_padding = layer.pool_padding
+        lparams.c_padding = layer.c_padding
+        lparams.pool_type = layer.pool_type
         section  = layer.section
         layerislast = layer.islast_insection
-        layer_params.islastlayer = layerislast
+        lparams.islastlayer = layerislast
         nn = layer.parent
-        layer_params.islast_inbatch = (section == nn.total_sections-1
+        lparams.islast_inbatch = (section == nn.total_sections-1
                                  ) or (section > 0)
-        layer_params.hw_size_padding = (
+        lparams.hw_size_padding = (
             prod(layer.HWs.pool_padding) * layer.tile_counts[N])
-        layer_params.total_c_padding_writes = (
+        lparams.total_c_padding_writes = (
             prod(layer.HWs.c) * layer.tile_counts[N])
-        layer_params.valid = 1
-        layer_params.loading_params_valid = (not layer.islast)
+        lparams.valid = 1
+        lparams.loading_params_valid = (not layer.islast)
         if layer.position == layer.parent.input_load_pos:
-            layer_params.load_input = 1
+            lparams.load_input = 1
         if layer.islast_insection:
-            layer_params.total_inference_writes = int(prod(
+            lparams.total_inference_writes = int(prod(
                 layer.expected.device.c.size()) / layer.device.MXU_SIZE.j)
 
     def _set_offsets(self, layer):
