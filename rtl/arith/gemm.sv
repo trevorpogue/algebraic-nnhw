@@ -2,89 +2,36 @@
 
 module gemm import globals::*;
     #(`IMPORT_ARITH)
-    (data a, b, c,
-     input logic clk, resetn
+    (data a,
+     data b,
+     data c,
+     input LayerParams layer_params,
+     input logic clk,
+     input logic resetn
      );
-    localparam integer MXU_SZJ = SZJ;
-    localparam         IN_WIDTH = LAYERIO_WIDTH;
-    localparam         OUT_WIDTH = CHAIN_WIDTH;
-    localparam         type MXUQ = logic [0:0][MXU_SZJ-1:0][CHAIN_WIDTH-1:0];
-    MacJVec accum_mem_q; Info accum_mems_info;
-    MXUQ mxu; Info mxus_info;
-    mxu_wrapper #(Ajvec, Bivec, MXU,
-                  `EXPORT_TOP_(,,MXU_SZJ,,,IN_WIDTH,IN_WIDTH)) mxus_u
-        (.c(mxu), .cinfo(mxus_info),
-         .a(a), .ainfo(a.info), .b(b), .binfo(b.info), .clk, .resetn);
-    accum_mem_wrapper #(MacJVec, MXU, OUT_WIDTH, SZJ, MXU_SZJ,
-                        `EXPORT_TOP_(,,MXU_SZJ,,,,,,,,CHAIN_WIDTH))
-    accum_mems_u
-        (.q(accum_mem_q), .qinfo(accum_mems_info),
-         .d(mxu), .dinfo(mxus_info), .clk, .resetn);
-    Info _cinfo;
-    assign c.info_master.value = _cinfo;
-    triangle_buf2 #(.D(Cjvec), .SLOPE(1)) q_u
-        (.q(c.value), .qinfo(_cinfo),
-         .d(accum_mem_q), .dinfo(accum_mems_info), .clk, .resetn);
-endmodule
-
-
-module mxu_wrapper import globals::*;
-    #(type A_, B_, C_, integer `IMPORT_ARITH)
-    (output C_ c, Info cinfo, input A_ a, Info ainfo, B_ b, Info binfo,
-     logic clk, resetn);
-    Chainjvec _mxu; Info _mxuinfo;
-    Chainjvec sign_extended_q; Info sign_extended_qinfo;
+    data #(Chainivec) mxu(.*);
     mxu #(`EXPORT_ARITH) mxu_u
-        (.a(a[MXU_I]), .ainfo(ainfo),
-         .b(b[MXU_I]), .binfo(binfo),
-         .c(_mxu),
-         .cinfo(_mxuinfo),
-         .clk, .resetn);
-    sign_extender #(Chainjvec, `EXPORT_ARITH) sign_extender_u
-        (.q(sign_extended_q), .qinfo(sign_extended_qinfo),
-         .d(_mxu), .dinfo(_mxuinfo),
-         .clk, .resetn);
-    assign c[MXU_I] = sign_extended_q;
-    if (MXU_I == 0) assign cinfo = sign_extended_qinfo;
-endmodule
-
-
-module sign_extender import globals::*;
-    #(type D, `IMPORT_ARITH)
-    (output D q, Info qinfo, input D d, Info dinfo, logic clk, resetn);
-    localparam DELAY0 = 0; `REG(qinfo, dinfo, DELAY0);
-    localparam integer ABW_OVER2 = A_WIDTH/2;
-    localparam integer BBW_OVER2 = B_WIDTH/2;
-    `FOR(genvar, I, SZJ) begin
+      (.a(a.value), .ainfo(a.info), .b(b.value), .binfo(b.value),
+       .c(mxu.value), .cinfo(mxu.info_master.value), .clk, .resetn);
+    data #(Chainivec) mxu_(.*);
+    data #(Civec) mxu__(.*);
+    assign mxu__.info_master.value = layer_params.size_w_gemm?
+                                     mxu_.info : a.info;
+    `FOR(genvar, I, SZI) begin
         Chain x;
-        Chain y, z;
-        assign q[I] = y;
-        assign x = d[I];
-        `always_comb begin
-            y = x;
-            z = x;
-        end
+        assign x = mxu_.value[I];
+        assign mxu__.value[I] = layer_params.size_w_gemm?
+                                A_SIGNED? $signed(x) : x
+                                : A_SIGNED? $signed(a.value) : a.value;
     end
-endmodule
-
-
-module accum_mem_wrapper import globals::*;
-    #(type Q, D, integer OUT_WIDTH, TSZJ, MXU_SZJ, `IMPORT_ARITH)
-    (output Q q, Info qinfo, input D d, Info dinfo, logic clk, resetn);
-    localparam type __D = logic [0:0][SZJ-1:0][OUT_WIDTH-1:0];
-    __D __d; Info __dinfo;
-    logic [0:0][SZJ-1:0][ACCUM_WIDTH-1:0] _d; Info _dinfo;
-    assign __d = d;
-    assign _dinfo = dinfo;
-    `SIGNED(assign _d[0][0] =, B_SIGNED, __d[0][0]);
-    MacIVec _d_; Info _d_info;
-    MacIVec _q; Info _qinfo;
-    assign _d_info = _dinfo;
-    assign _d_ = _d;
-    accum_mem #(MacIVec, `EXPORT_ARITH) accum_mem_u
-        (.q(_q), .qinfo(_qinfo), .d(_d_), .dinfo(_d_info), .clk, .resetn);
-    assign q = _q;
-    assign qinfo = _qinfo;
+    data #(Civec) _c(.*);
+    triangle_buf #(.SLOPE(-1)) d_u (.q(mxu_), .d(mxu));
+    accum_mem #(Civec, `EXPORT_ARITH) accum_mem_u
+      (.q(_c.value), .qinfo(_c.info_master.value),
+       .d(mxu__.value), .dinfo(mxu__.info), .clk, .resetn);
+    triangle_buf #(.SLOPE(1)) q_u (.q(c), .d(_c));
+    assign synth_mxu = mxu_.value;
+    assign synth_gemm = c.value;
 endmodule
 
 
@@ -102,9 +49,9 @@ module accum_mem import globals::*;
     Civec _q;
     Info _info;
     add_vec2 #(Civec, Civec, Civec) add_u
-        (.d(d_), .dinfo(d_info), .x(fifo_q), .q(_sum),
-         .qinfo(_suminfo),
-         .en(!d_info.first_tile_k & d_info.valid), .clk, .resetn);
+      (.d(d_), .dinfo(d_info), .x(fifo_q), .q(_sum),
+       .qinfo(_suminfo),
+       .en(!d_info.first_tile_k & d_info.valid), .clk, .resetn);
     localparam   DELAY0 = 1;
     localparam   DELAY1 = 1;
     localparam   DELAY2 = 1;
