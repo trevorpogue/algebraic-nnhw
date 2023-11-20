@@ -1,9 +1,14 @@
-This repository contains the source code for our accelerator that can be parameterized to contain the baseline, FIP, or FFIP MXUs.
+This repository contains for reference the core portions of the accelerator RTL and compiler source code developed as part of the following journal publication:
+
+T. E. Pogue and N. Nicolici, "Fast Inner-Product Algorithms and Architectures for Deep Neural Network Accelerators," in IEEE Transactions on Computers, doi: 10.1109/TC.2023.3334140.
+
+https://ieeexplore.ieee.org/document/10323219
+
 The organization is as follows:
 - compiler
-  - A compiler for parsing Python models into accelerator instructions that allow it to accelerate the model. This part also includes code for interfacing with a PCIe driver for initiating model execution on the accelerator, reading back results and performance counters, and testing the correctness of the results.
+  - A compiler for parsing Python model descriptions into accelerator instructions that allow it to accelerate the model. This part also includes code for interfacing with a PCIe driver for initiating model execution on the accelerator, reading back results and performance counters, and testing the correctness of the results.
 - rtl
-  - Synthesizable SystemVerilog source code for the accelerator.
+  - Synthesizable SystemVerilog RTL.
 - sim
   - Scripts for setting up simulation environments for testing.
 - tests
