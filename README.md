@@ -2,7 +2,9 @@ This repository contains for reference the core portions of the accelerator RTL 
 
 T. E. Pogue and N. Nicolici, "Fast Inner-Product Algorithms and Architectures for Deep Neural Network Accelerators," in IEEE Transactions on Computers, doi: 10.1109/TC.2023.3334140.
 
-https://ieeexplore.ieee.org/document/10323219
+https://doi.org/10.1109/TC.2023.3334140
+
+https://arxiv.org/abs/2311.12224
 
 The organization is as follows:
 - compiler
