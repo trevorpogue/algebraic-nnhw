@@ -6,6 +6,8 @@ https://doi.org/10.1109/TC.2023.3334140
 
 https://arxiv.org/abs/2311.12224
 
+<p align="center"><img src="https://github.com/trevorpogue/algebraic-nnhw/assets/12535207/11a7d485-04a3-4e9d-b9fb-91c35c80086f" width="450"/></p>
+
 The organization is as follows:
 - compiler
   - A compiler for parsing Python model descriptions into accelerator instructions that allow it to accelerate the model. This part also includes code for interfacing with a PCIe driver for initiating model execution on the accelerator, reading back results and performance counters, and testing the correctness of the results.
