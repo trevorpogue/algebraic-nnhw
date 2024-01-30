@@ -3,7 +3,7 @@ This repository contains the source code for ML hardware architectures that requ
 T. E. Pogue and N. Nicolici, "Fast Inner-Product Algorithms and Architectures for Deep Neural Network Accelerators," in IEEE Transactions on Computers, vol. 73, no. 2, pp. 495-509, Feb. 2024, doi: 10.1109/TC.2023.3334140.
 <!-- keywords: {Hardware;Systolic arrays;Computer architecture;Throughput;Adders;Machine learning;Computational modeling;Algorithms;hardware acceleration;arithmetic complexity;AI; Artificial Intelligence;Deep learning;DL;ML;Large language model;LLM;Transformer;Neural network;NN;DNN} -->
 
-Article URL: https://ieeexplore.ieee.org/abstract/document/10323219
+Article URL: https://ieeexplore.ieee.org/document/10323219
 
 Open-access version: https://arxiv.org/abs/2311.12224
 
@@ -14,6 +14,9 @@ The following diagram shows an overview of the ML accelerator system implemented
 
 The FIP and FFIP systolic array/MXU processing elements (PE)s shown below in (b) and (c) implement the FIP and FFIP inner-product algorithms and each individually provide the same effective computational power as the two baseline PEs shown in (a) combined which implement the baseline inner product as in previous systolic-array ML accelerators:
 <p align="center"><img src="https://github.com/trevorpogue/algebraic-nnhw/assets/12535207/d9b956a2-25fa-4173-8ba9-8fd27d02f0c1" width="450"/></p>
+
+The following is a diagram of the MXU/systolic array and shows how the PEs are connected:
+<p align="center"><img src="https://github.com/trevorpogue/algebraic-nnhw/assets/12535207/baf3e2f7-1767-49ec-811e-7cb44fac8d92" width="450"/></p>
 
 The source code organization is as follows:
 - compiler
