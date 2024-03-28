@@ -19,7 +19,7 @@ module instruc import globals::*;
     // Recieves and decodes instructions from pcie that contain information
     // like the weights or the tiling parameters which tell the memory
     // controller  how to traverse through the data.
-    // globals instructions are recieved straight from pcie, then this module
+    // globals instructions are received straight from pcie, then this module
     // decodes them into separate instructions for the gemm memory and
     // arithmetic_unit (sys_arr and post_gemmm_arith_u unit),
 
