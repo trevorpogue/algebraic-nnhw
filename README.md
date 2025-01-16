@@ -1,7 +1,17 @@
-This repository contains the source code for ML hardware architectures that require nearly half the number of multiplier units to achieve the same performance, by executing alternative inner-product algorithms that trade nearly half the multiplications for cheap low-bitwidth additions, while still producing identical output as the conventional inner product. This increases the theoretical throughput and compute efficiency limits of ML accelerators. See the following journal publication for the full details:
+This repository contains the source code for an ML acclerator system used as a basis for validating the systolic-array architectures proposed in the following journal publications and PhD Thesis:
+
+https://ieeexplore.ieee.org/document/10323219
+
+https://ieeexplore.ieee.org/document/10827828
+
+https://macsphere.mcmaster.ca/handle/11375/30640
+
+The architectures exploit overlooked or proposed efficient matrix multiplication algorithms in hardware to increase performance‐per‐area. This is the description for how the source code relates to the first publication:
+
+This repository contains the source code for ML hardware architectures that require nearly half the number of multiplier units to achieve the same performance, by executing alternative inner-product algorithms that trade nearly half the multiplications for cheap low-bitwidth additions, while still producing identical output as the conventional inner product. This increases the normal theoretical throughput and compute efficiency limits of ML accelerators. See the following journal publication for the full details:
 
 T. E. Pogue and N. Nicolici, "Fast Inner-Product Algorithms and Architectures for Deep Neural Network Accelerators," in IEEE Transactions on Computers, vol. 73, no. 2, pp. 495-509, Feb. 2024, doi: 10.1109/TC.2023.3334140.
-<!-- keywords: {Hardware;Systolic arrays;Computer architecture;Throughput;Adders;Machine learning;Computational modeling;Algorithms;hardware acceleration;arithmetic complexity;AI; Artificial Intelligence;Deep learning;DL;ML;Large language model;LLM;Transformer;Neural network;NN;DNN} -->
+<!-- keywords: {Hardware;Systolic arrays;Computer architecture;Throughput;Adders;Machine learning;Computational modeling;Algorithms;hardware acceleration;arithmetic complexity;AI; Artificial Intelligence;Deep learning;DL;ML;Large language model;LLM;GPT;Transformer;Neural network;NN;DNN} -->
 
 Article URL: https://ieeexplore.ieee.org/document/10323219
 
