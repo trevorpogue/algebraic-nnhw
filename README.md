@@ -1,4 +1,4 @@
-This repository contains the source code for an ML acclerator system used as a basis for validating the systolic-array architectures proposed in the following journal publications and PhD Thesis:
+This repository contains the source code for an ML accelerator system used as a basis for validating the systolic-array architectures proposed in the following journal publications and PhD Thesis:
 
 https://ieeexplore.ieee.org/document/10323219
 
