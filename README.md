@@ -1,5 +1,5 @@
 # Algebraic Enhancements for GEMM & AI Accelerators
-This repository contains the source code for a GEMM & deep learning hardware accelerator system used to validate proposed systolic array hardware architectures that implement under-explored or proposed efficient matrix multiplication algorithms in hardware, to increase the traditional performance-per-area limits of GEMM & AI accelerators while producing identical output.
+This repository contains the source code for a GEMM & deep learning hardware accelerator system used to validate proposed systolic array hardware architectures that implement under-explored or proposed efficient matrix multiplication algorithms in hardware, to compute the same output with less hardware resources or execution time.
 The results achieved:
 * Up to 3× faster CNN inference than state-of-the-art accelerators implemented on the same type of compute platform
 * \>2× higher mults/multiplier/clock cycle
@@ -22,6 +22,12 @@ The field of deep learning has seen increasing breakthroughs and commercial adop
 To address this need, recent years have seen many works for optimizing deep learning inference in hardware. Systolic arrays are an efficient class of hardware designs to use as a starting point for this application. However, after hardware-oriented deep learning model optimizations reach their limits, after the known parallelism for executing their compute patterns in hardware is exhausted, and after technology scaling slows to a halt, there is an accelerator wall that limits further improvement on the implementation side.
 
 In this thesis, we contribute to this field through an under-explored direction by presenting new efficient matrix multiplication algorithms and/or their systolic array hardware architectures that increase performance-per-area by reducing the workload at the algebraic level, and thus by computing the same result from a re-arranged compute pattern requiring fewer or cheaper operations to be performed in hardware. We evaluate our architectures in an end-to-end deep learning accelerator, demonstrating their ability to increase the performance-per-area of hardware accelerators beyond their normal theoretical limits.
+
+### Why Increase Performance Per MAC?
+The majority of the computational workload in deep learning models can commonly be mapped to matrix multiplication, which consists of a series of multiply-accumulate operations. For all deep learning accelerators, unless additional algebraic innovations are used, the throughput is ultimately limited by the maximum number of multiply-accumulate operations that can be performed per clock cycle.
+Due to this, deep learning accelerators contain a large number of MAC units, causing multipliers and MAC units to commonly be one of the hardware area-dominant resources in GEMM and deep learning accelerators, and an accelerator's throughput can be directly limited by how many multipliers its hardware budget can afford. For example, in FPGA implementations, the DSP units (which instantiate MAC units) can often run out before the LUT and register resources.
+
+As a result, surpassing this theoretical performance per multiplier limit should be a key area of interest for advancing the field of deep learning acceleration. However, this research direction has been under-explored. In this work, we continue in this under-explored direction by providing algebraic enhancements for matrix multiplication algorithms and their custom hardware implementations for the application of matrix multiplication and deep learning acceleration.
 
 ### Scope of Contributions
 The contributions in [1]-[4] are relevant for the following scope of applications:
